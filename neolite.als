@@ -1,96 +1,129 @@
 module neolite
 
 -----------------------------------------------------------------------------------------------------------
--- SIGNATURES
+-- Signatures
 -----------------------------------------------------------------------------------------------------------
 
 sig Organization {
-	orgMembers: set Member,
 	repositories: set Repository,
+	orgMembers: set Member,
 	teams: set Team
 }
 
-sig Member {}
-
-sig Repository {}
-
-sig Team {	
+sig Team {
 	teamMembers: set Member
 }
 
+sig Repository { }
+
+sig Member { }
+
 -----------------------------------------------------------------------------------------------------------
--- FACTS
+-- Facts
 -----------------------------------------------------------------------------------------------------------
 
 fact uniqueOrganization {
 	one Organization
 }
 
-fact organizationMustHaveSomeMember {
+fact organizationHasMembers {
 	all o: Organization | some o.orgMembers
 }
 
-fact teamMustHaveSomeMember {
+fact teamsHaveMembers {
 	all t: Team | some t.teamMembers
 }
 
-fact memberMustBeOrganizationMember {
-	all m: Member | one m.~orgMembers
-}
-
-fact teamMustBePartOfOrganization {
-	all t: Team | one t.~teams
-}
-
-fact repositoryMustBePartOfOrganization {
+fact repositoriesBondedToOrganization {
 	all r: Repository | one r.~repositories
 }
 
+fact membersBondedToOrganization {
+	all m: Member | one m.~orgMembers
+}
+
+fact teamsBondedToOrganization {
+	all t: Team | one t.~teams
+}
+
 -----------------------------------------------------------------------------------------------------------
--- TESTS
+-- Predicates
+-----------------------------------------------------------------------------------------------------------
+
+pred show[] { }
+
+-----------------------------------------------------------------------------------------------------------
+-- Functions
+-----------------------------------------------------------------------------------------------------------
+
+fun getOrganizationRepositories [o: Organization] : set Repository {
+    Repository & o.repositories
+}
+
+fun getOrganizationMembers [o: Organization] : set Member {
+    Member & o.orgMembers
+}
+
+fun getOrganizationTeams [o: Organization] : set Team {
+    Team & o.teams
+}
+
+fun getTeamMembers [t: Team] : set Member {
+	Member & t.teamMembers
+}
+
+fun getNonTeamMembers [t: Team] : set Member {
+	Member - t.teamMembers
+}
+
+-----------------------------------------------------------------------------------------------------------
+-- Asserts
 -----------------------------------------------------------------------------------------------------------
 
 assert testUniqueOrganization {
 	one Organization
 }
 
-check testUniqueOrganization for 20
-
 assert testOrganizationMustHaveSomeMember {
 	all o: Organization | #(o.orgMembers) > 0
 }
 
-check testOrganizationMustHaveSomeMember for 20
+
 
 assert testTeamMustHaveSomeMember {
 	all t: Team | #(t.teamMembers) > 0
 }
 
-check testTeamMustHaveSomeMember for 20
-
 assert testMemberMustBeOrganizationMember {
 	all m: Member | #(m.~orgMembers) = 1
 }
-
-check testMemberMustBeOrganizationMember for 20
 
 assert testTeamMustBePartOfOrganization {
 	all t: Team | #(t.~teams) = 1
 }
 
-check testTeamMustBePartOfOrganization for 20
-
 assert testRepositoryMustBePartOfOrganization {
 	all r: Repository | #(r.~repositories) = 1
 }
-
-check testRepositoryMustBePartOfOrganization for 20
 
 assert testOrganizationWithNoTeams {
 	lone o: Organization | #(o.teams) = 0
 }
 
+-----------------------------------------------------------------------------------------------------------
+-- Checks
+-----------------------------------------------------------------------------------------------------------
+
+check testUniqueOrganization for 20
+check testOrganizationMustHaveSomeMember for 20
+check testTeamMustHaveSomeMember for 20
+check testMemberMustBeOrganizationMember for 20
+check testTeamMustBePartOfOrganization for 20
+check testRepositoryMustBePartOfOrganization for 20
 check testOrganizationWithNoTeams for 20
 
-pred show[]{}
+-----------------------------------------------------------------------------------------------------------
+-- Show
+-----------------------------------------------------------------------------------------------------------
+
 run show for 10
