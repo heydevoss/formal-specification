@@ -22,7 +22,7 @@ sig Member { }
 -- Facts
 -----------------------------------------------------------------------------------------------------------
 
-fact uniqueOrganization {
+fact singleOrganization {
 	one Organization
 }
 
@@ -46,9 +46,17 @@ fact teamsBondedToOrganization {
 	all t: Team | one t.~teams
 }
 
+fact TeamsAndMembersBondedToSameOrganization {
+	all t: Team, m: Member | BondingTeamsAndMembersToOrganization[t, m]
+}
+
 -----------------------------------------------------------------------------------------------------------
 -- Predicates
 -----------------------------------------------------------------------------------------------------------
+
+pred BondingTeamsAndMembersToOrganization [t: Team, m: Member] {
+	(m in t.teamMembers) <=> (m.~orgMembers = t.~teams)
+}
 
 pred show[] { }
 
@@ -64,7 +72,7 @@ fun getOrganizationMembers [o: Organization] : set Member {
     Member & o.orgMembers
 }
 
-fun getOrganizationTeams [o: Organization] : set Team {
+fun getTeamMembers [o: Organization] : set Team {
     Team & o.teams
 }
 
@@ -80,50 +88,64 @@ fun getNonTeamMembers [t: Team] : set Member {
 -- Asserts
 -----------------------------------------------------------------------------------------------------------
 
-assert testUniqueOrganization {
-	one Organization
+assert testSingleOrganization {
+	#Organization = 1
 }
 
-assert testOrganizationMustHaveSomeMember {
-	all o: Organization | #(o.orgMembers) > 0
+assert testOrganizationHasMembers {
+	all o: Organization | #(getOrganizationMembers[o]) > 0
 }
 
-
-
-assert testTeamMustHaveSomeMember {
-	all t: Team | #(t.teamMembers) > 0
+assert testTeamsHaveMembers {
+	all t: Team | #(getTeamMembers[t]) > 0
 }
 
-assert testMemberMustBeOrganizationMember {
-	all m: Member | #(m.~orgMembers) = 1
-}
-
-assert testTeamMustBePartOfOrganization {
-	all t: Team | #(t.~teams) = 1
-}
-
-assert testRepositoryMustBePartOfOrganization {
+assert testRepositoriesBondedToOrganization {
 	all r: Repository | #(r.~repositories) = 1
 }
 
-assert testOrganizationWithNoTeams {
-	lone o: Organization | #(o.teams) = 0
+assert testMembersBondedToOrganization {
+	all m: Member | #(m.~orgMembers) = 1
+}
+
+assert testTeamsBondedToOrganization {
+	all t: Team | #(t.~teams) = 1
+}
+
+assert testOrganizationCanHaveNoTeams {
+	all o: Organization | #(getOrganizationMembers[o]) >= 0
+}
+
+assert testOrganizationCanHaveNoRepositories {
+	all o: Organization | #(getOrganizationRepositories[o]) >= 0
+}
+
+assert testTeamsCanHaveNoMembers {
+	all t: Team | #(getTeamMembers[t]) >= 0
+}
+
+assert testTeamsAndMembersBondedToSameOrganization {
+	all t: Team, m: Member | (m in t.teamMembers) => (m.~orgMembers = t.~teams)
+	all t: Team, m: Member | (m.~orgMembers = t.~teams) => (m in t.teamMembers)
 }
 
 -----------------------------------------------------------------------------------------------------------
 -- Checks
 -----------------------------------------------------------------------------------------------------------
 
-check testUniqueOrganization for 20
-check testOrganizationMustHaveSomeMember for 20
-check testTeamMustHaveSomeMember for 20
-check testMemberMustBeOrganizationMember for 20
-check testTeamMustBePartOfOrganization for 20
-check testRepositoryMustBePartOfOrganization for 20
-check testOrganizationWithNoTeams for 20
+check testSingleOrganization for 20
+check testOrganizationHasMembers for 20
+check testTeamsHaveMembers for 20
+check testRepositoriesBondedToOrganization for 20
+check testMembersBondedToOrganization for 20
+check testTeamsBondedToOrganization for 20
+check testOrganizationCanHaveNoTeams for 20
+check testOrganizationCanHaveNoRepositories for 20
+check testTeamsCanHaveNoMembers for 20
+check testTeamsAndMembersBondedToSameOrganization for 20
 
 -----------------------------------------------------------------------------------------------------------
 -- Show
 -----------------------------------------------------------------------------------------------------------
 
-run show for 10
+run show for 20
