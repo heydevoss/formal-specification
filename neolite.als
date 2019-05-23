@@ -30,10 +30,6 @@ fact organizationHasMembers {
 	all o: Organization | some o.orgMembers
 }
 
-fact teamsHaveMembers {
-	all t: Team | some t.teamMembers
-}
-
 fact repositoriesBondedToOrganization {
 	all r: Repository | one r.~repositories
 }
