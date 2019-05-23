@@ -4,7 +4,7 @@ module neolite
 -- SIGNATURES
 -----------------------------------------------------------------------------------------------------------
 
-sig organization {
+sig Organization {
 	orgMembers: set Member,
 	repositories: set Repository,
 	teams: set Team
