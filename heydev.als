@@ -1,4 +1,4 @@
-module neolite
+module heydev
 
 -----------------------------------------------------------------------------------------------------------
 -- Signatures
@@ -68,7 +68,7 @@ fun getOrganizationMembers [o: Organization] : set Member {
     Member & o.orgMembers
 }
 
-fun getTeamMembers [o: Organization] : set Team {
+fun getOrganizationTeams [o: Organization] : set Team {
     Team & o.teams
 }
 
