@@ -42,15 +42,15 @@ fact teamsBondedToOrganization {
 	all t: Team | one t.~teams
 }
 
-fact TeamsAndMembersBondedToSameOrganization {
-	all t: Team, m: Member | BondingTeamsAndMembersToOrganization[t, m]
+fact teamsAndMembersBondedToSameOrganization {
+	all t: Team, m: Member | bondingTeamsAndMembersToOrganization[t, m]
 }
 
 -----------------------------------------------------------------------------------------------------------
 -- Predicates
 -----------------------------------------------------------------------------------------------------------
 
-pred BondingTeamsAndMembersToOrganization [t: Team, m: Member] {
+pred bondingTeamsAndMembersToOrganization [t: Team, m: Member] {
 	(m in t.teamMembers) <=> (m.~orgMembers = t.~teams)
 }
 
